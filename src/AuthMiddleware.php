@@ -7,8 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class AuthMiddleware
 {
-    const LOGIN_PAGE = '/login';
-    const FOUND = 302;
+    const UNAUTHORIZED = 401;
 
     private $auth;
 
@@ -22,12 +21,10 @@ class AuthMiddleware
         ResponseInterface $response,
         callable $next
     ) {
-        // BEFORE
+        if (!$this->auth->offsetExists('id')) {
+            return $response->withStatus(self::UNAUTHORIZED)->withHeader('Location', '/login');
+        }
 
-        $response = $next($request, $response);
-
-        // AFTER
-
-        return $response;
+        return $next($request, $response);
     }
 }
